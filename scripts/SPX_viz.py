@@ -1,14 +1,13 @@
 import pandas as pd
-import numpy as np
 from os import path
 from matplotlib import pyplot as plt
 
 
-DATA_DIR = path.normpath(
+DATA_DIR: str = path.normpath(
     path.split(path.realpath(__file__))[0] + "/../unzipped_data"
 )
-YEARS = [2001, 2008, 2015, 2018]
-N_YEARS = len(YEARS)
+YEARS: [int] = [2001, 2008, 2015, 2018]
+N_YEARS: int = len(YEARS)
 
 
 def SPX_visualization() -> None:
