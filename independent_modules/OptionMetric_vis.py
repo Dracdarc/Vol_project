@@ -7,7 +7,7 @@ DATA_DIR: str = path.normpath(
     path.split(path.realpath(__file__))[0] + "/../data"
 )
 INDEX: [str] = ["DJX", "NDX", "SPX"]
-YEARS: "Dict str -> [int]" = dict()
+YEARS: "dict: str -> [int]" = dict()
 YEARS["DJX"] = [2001, 2008, 2018]
 YEARS["NDX"] = [2001, 2008, 2018]
 YEARS["SPX"] = [2001, 2008, 2015]

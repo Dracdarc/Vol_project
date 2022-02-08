@@ -1,0 +1,3 @@
+data/*.csv
+__pycache__
+put_your_data_here.txt
