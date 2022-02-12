@@ -1,4 +1,4 @@
-from functions.utility import normal_cdf, ln, e
+from functions.utility import normal_cdf, exp, ln
 
 
 def black_scholes_pricing(
@@ -15,9 +15,9 @@ def black_scholes_pricing(
     d2: float = d1 - alpha
     if option_type.lower() == "call":
         return (underlying_price*normal_cdf(d1)
-                - strike*normal_cdf(d2)*e**(-interest*maturity))
+                - strike*normal_cdf(d2)*exp(-interest*maturity))
     elif option_type.lower() == "put":
-        return (strike*normal_cdf(-d2)*e**(-interest*maturity)
+        return (strike*normal_cdf(-d2)*exp(-interest*maturity)
                 - underlying_price*normal_cdf(-d1))
     else:
         return -1.

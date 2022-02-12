@@ -20,10 +20,10 @@ if abs(utility.SQRT_1_2 - 0.70710678119) < EPSILON:
 else:
     print("utility -> SQRT_1_2: ERROR!")
 
-if abs(utility.e - 2.71828182846) < EPSILON:
-    print("utility -> e: No problem")
+if abs(utility.exp(1.) - 2.71828182846) < EPSILON:
+    print("utility -> exp: No problem")
 else:
-    print("utility -> e: ERROR!")
+    print("utility -> exp: ERROR!")
 
 
 # BS_pricing
