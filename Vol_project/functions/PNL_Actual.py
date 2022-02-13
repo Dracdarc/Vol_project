@@ -49,9 +49,9 @@ def actual_pnl_simulation(
         i_t: int,
         op__type: str = op_type
     ) -> (float):
-        alpha: float = sigma * expiry_date**.5
+        alpha: float = sigma * tau**.5
         d1: float = (ln(asset_prices[i_t] / strike)
-                     + (interest-dividend+sigma**2/2.)*expiry_date) / alpha
+                     + (interest-dividend+sigma**2/2.)*tau) / alpha
         d2: float = d1 - alpha
         delta_res: float
         if op__type.lower() == "call":
