@@ -4,9 +4,9 @@ from functions.PNL_Actual import actual_pnl_simulation
 n_simulation = 5
 expiry_date: float = 1.
 strike: float = 100.
-actual_vol: float = .3
-implied_vol: float = .2
-interest: float = 0.05
+actual_vol: float = 0.3
+implied_vol: float = 0.2
+interest: float = 0.1
 dividend: float = 0.
 drift: float = 0.1
 

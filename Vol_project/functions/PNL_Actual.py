@@ -22,14 +22,20 @@ def actual_pnl_simulation(
 
     t_list: [float] = [i*dt for i in range(n_steps_time)]
     sqrt_dt: float = dt**.5
+
     asset_prices: [float] = [asset_price0]
     for _ in range(n_steps_time-1):
         asset_prices.append(
             asset_prices[-1]
             * (1 + drift*dt + actual_vol*np.random.normal(0., sqrt_dt))
         )
+
     brownian_jump: [[float]] = [
         [np.random.normal(0., sqrt_dt) for __ in range(n_steps_time-1)]
+        for _ in range(n_simulation)
+    ]
+    dpnl: [[float]] = [
+        [0. for __ in range(n_steps_time-1)]
         for _ in range(n_simulation)
     ]
     pnl: [[float]] = [
@@ -45,7 +51,7 @@ def actual_pnl_simulation(
     ) -> (float):
         alpha: float = sigma * expiry_date**.5
         d1: float = (ln(asset_prices[i_t] / strike)
-                     + (interest-dividend+sigma**2/2)*expiry_date) / alpha
+                     + (interest-dividend+sigma**2/2.)*expiry_date) / alpha
         d2: float = d1 - alpha
         delta_res: float
         if op__type.lower() == "call":
@@ -68,14 +74,21 @@ def actual_pnl_simulation(
         for sim in range(n_simulation):
             delta_a = delta(actual_vol, tau, i_t)[0]
             (delta_i, d1, d2) = delta(implied_vol, tau, i_t)
-            pnl[sim][i_t] = (
-                pnl[sim][i_t-1]
-                + coef_1*exp_rtau*normal_df(d2)/sqrt_tau
+            dpnl[sim][i_t-1] = (
+                coef_1*exp_rtau*normal_df(d2)/sqrt_tau
                 + (coef_2 + actual_vol*brownian_jump[sim][i_t-1])
                 * asset_prices[i_t] * (delta_i - delta_a)
             )
-    plt.plot(t_list, asset_prices)
-    plt.show()
+
+    interest_factor: float = exp(interest*dt)
     for sim in range(n_simulation):
-        plt.plot(t_list, pnl[sim])
+        for i in range(n_steps_time-1):
+            pnl[sim][i+1] = interest_factor*pnl[sim][i] + dpnl[sim][i]
+        for i in range(1, n_steps_time):
+            pnl[sim][i] *= exp(-interest*t_list[i])
+
+    fig, (ax1, ax2) = plt.subplots(2)
+    ax1.plot(t_list, asset_prices)
+    for sim in range(n_simulation):
+        ax2.plot(t_list, pnl[sim])
     plt.show()
