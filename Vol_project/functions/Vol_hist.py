@@ -1,4 +1,4 @@
-from functions.utility import avg
+from functions.math_utility import avg
 
 
 def list_vol_hist(C: [float]) -> [float]:

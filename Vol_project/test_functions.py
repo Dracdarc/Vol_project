@@ -1,5 +1,5 @@
 from functions import (
-    utility,
+    math_utility,
     BS_pricing,
     Vol_hist,
     Vol_impl
@@ -15,15 +15,15 @@ print("Beginning of the tests: ")
 # utility
 print("\n----> utility: ")
 
-if abs(utility.SQRT_1_2 - 0.70710678119) < EPSILON:
-    print("utility -> SQRT_1_2: No problem")
+if abs(math_utility.SQRT_1_2 - 0.70710678119) < EPSILON:
+    print("math_utility -> SQRT_1_2: No problem")
 else:
-    print("utility -> SQRT_1_2: ERROR!")
+    print("math_utility -> SQRT_1_2: ERROR!")
 
-if abs(utility.exp(1.) - 2.71828182846) < EPSILON:
-    print("utility -> exp: No problem")
+if abs(math_utility.exp(1.) - 2.71828182846) < EPSILON:
+    print("math_utility -> exp: No problem")
 else:
-    print("utility -> exp: ERROR!")
+    print("math_utility -> exp: ERROR!")
 
 
 # BS_pricing

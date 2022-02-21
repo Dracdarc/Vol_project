@@ -1,4 +1,4 @@
-from functions.utility import normal_cdf, exp, ln
+from functions.math_utility import normal_cdf, exp, ln
 
 
 def black_scholes_pricing(
