@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from functions.math_utility import normal_df, normal_cdf, exp, ln
+from functions.math_utility import normal_df, get_delta, exp
 
 
 plt.style.use('ggplot')
@@ -25,23 +25,6 @@ def actual_strategy_pnl(
     dpnl: [float] = [0. for _ in range(n_steps_time)]
     pnl: [float] = [0. for _ in range(n_steps_time + 1)]
 
-    def delta(
-        sigma: float,
-        tau: float,
-        i_t: int,
-        op__type: str = op_type
-    ) -> (float):
-        alpha: float = sigma * tau**.5
-        d1: float = (ln(asset_prices[i_t] / strike)
-                     + (interest-dividend+sigma**2/2.)*tau) / alpha
-        d2: float = d1 - alpha
-        delta_res: float
-        if op__type.lower() == "call":
-            delta_res = exp(-dividend*tau)*normal_cdf(d1)
-        else:
-            delta_res = -exp(-dividend*tau)*normal_cdf(-d1)
-        return (delta_res, d1, d2)
-
     def get_jump(i_t: int) -> float:
         return (
             (asset_prices[i_t-1]-asset_prices[i_t]
@@ -60,8 +43,14 @@ def actual_strategy_pnl(
         tau = time[-1] - time[i_t]
         sqrt_tau = tau**.5
         exp_rtau = exp(-interest*tau)
-        delta_a = delta(actual_vol, tau, i_t)[0]
-        (delta_i, d1, d2) = delta(implied_vol, tau, i_t)
+        delta_a = get_delta(
+            asset_prices[i_t], actual_vol, tau, strike,
+            interest, dividend, op_type
+        )[0]
+        (delta_i, d1, d2) = get_delta(
+            asset_prices[i_t], implied_vol, tau, strike,
+            interest, dividend, op_type
+        )
         dpnl[i_t] = (
             coef_1*dt[i_t]*exp_rtau*normal_df(d2)/sqrt_tau
             + (coef_2*dt[i_t] + actual_vol*get_jump(i_t))
