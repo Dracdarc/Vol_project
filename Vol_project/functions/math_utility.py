@@ -42,26 +42,3 @@ def generate_GBM(
             gbm[-1]*(1 + mu*dt + sigma*np.random.normal(0., m.sqrt(dt)))
         )
     return gbm
-
-
-def get_delta(
-    asset_price: float,
-    sigma: float,
-    tau: float,
-    strike: float,
-    interest: float,
-    dividend: float,
-    op_type: str = "Call"
-) -> (float):
-    if tau == 0.:
-        tau = 1e-5
-    alpha: float = sigma * tau**.5
-    d1: float = (ln(asset_price / strike)
-                 + (interest-dividend+sigma**2/2.)*tau) / alpha
-    d2: float = d1 - alpha
-    delta_res: float
-    if op_type.lower() == "call":
-        delta_res = exp(-dividend*tau)*normal_cdf(d1)
-    else:
-        delta_res = -exp(-dividend*tau)*normal_cdf(-d1)
-    return (delta_res, d1, d2)

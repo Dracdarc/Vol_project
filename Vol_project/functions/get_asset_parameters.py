@@ -3,7 +3,7 @@ from functions.math_utility import ln, avg
 
 def get_param(time: [float], asset_values: [float]) -> (float):
     """
-    return a tuple with the drift then the historical volatility
+    return a tuple with the drift then the realized volatility
     """
     n_step: int = len(time) - 1
     dt: [float] = [time[i+1] - time[i] for i in range(n_step)]
