@@ -9,6 +9,9 @@ def black_scholes_pricing(
     maturity: float,
     option_type: str = "call"
 ) -> float:
+    """
+    Price an option with the Black Scholes model.
+    """
     alpha: float = volatility * maturity**.5
     d1: float = (ln(underlying_price / strike)
                  + (interest+volatility**2/2)*maturity) / alpha
