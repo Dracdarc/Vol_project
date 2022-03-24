@@ -13,6 +13,8 @@ def black_scholes_pricing(
     Price an option with the Black Scholes model.
     """
     alpha: float = volatility * maturity**.5
+    if not alpha:
+        alpha = 1e-10
     d1: float = (ln(underlying_price / strike)
                  + (interest+volatility**2/2)*maturity) / alpha
     d2: float = d1 - alpha

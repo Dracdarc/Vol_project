@@ -1,36 +1,65 @@
-from functions.PNL_Actual import actual_pnl_simulation
-from functions.PNL_Actual_backup import actual_pnl_full_simulation
-from plot_PNL import simu_on_data
+from functions.playground import OptionMonitoring
+from functions.BS_pricing import black_scholes_pricing
+from functions.math_utility import generate_GBM
 
+import numpy as np
+from matplotlib import pyplot as plt
 
-n_simulation = 5
-expiry_date: float = 1.
-strike: float = 100.
-asset_price0: float = strike
-actual_vol: float = 0.3
-implied_vol: float = 0.2
-interest: float = 0.05
+n_tics: int = 24*365
+refresh_rate: int = 12
+charges: float = .0
+
+S0: float = 100.
+drift: float = 0.02
+realized_volatility: float = 0.5
+interest: float = 0.02
 dividend: float = 0.
-drift: float = 0.5
-op_type: str = "call"
+
+maturity: float = 1.
+strike: float = 100.
 
 
-if True:
-    n_steps_time: int = 250
-    actual_pnl_simulation(
-        n_simulation, actual_vol, implied_vol, expiry_date, strike,
-        interest, dividend, drift, asset_price0, n_steps_time, op_type
+time_line: np.array = np.linspace(0., maturity, n_tics+1)
+dt: float = time_line[1]
+
+asset_prices: [float] = generate_GBM(
+    S0, drift, realized_volatility, time_line
+)
+
+option_prices = [
+  black_scholes_pricing(
+    asset_prices[i], strike, realized_volatility,
+    interest, time_line[-1]-time_line[i]
+  ) for i in range(n_tics+1)
+]
+
+world: OptionMonitoring = OptionMonitoring(
+    maturity=maturity,
+    strike=strike,
+    interest=interest
+)
+
+world.init(
+    underlying_price=asset_prices[0],
+    option_price=option_prices[0],
+    volatility=realized_volatility
+)
+
+for t in range(n_tics+1)[::refresh_rate][1:]:
+    world.update(
+        time=time_line[t],
+        underlying_price=asset_prices[t],
+        option_price=option_prices[t],
+        volatility=abs(realized_volatility + np.random.normal(0., 0.05))
     )
-    actual_pnl_full_simulation(
-        n_simulation, actual_vol, implied_vol, expiry_date, strike,
-        interest, dividend, drift, asset_price0, n_steps_time, op_type
-    )
 
-if False:
-    year: int
-    for year in [2001, 2008, 2015, 2018]:
-        do_estimation: bool = True
-        simu_on_data(
-            year, strike, interest, dividend, op_type,
-            implied_vol, actual_vol, drift, do_estimation
-        )
+world.end(
+    underlying_price=asset_prices[-1],
+    option_price=option_prices[-1]
+)
+
+world.display(
+    full_time_line=time_line,
+    full_underlying_prices=asset_prices,
+    full_option_prices=option_prices
+)
