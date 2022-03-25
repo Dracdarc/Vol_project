@@ -1,6 +1,7 @@
 from functions.math_utility import ln, avg
 
 import pandas as pd
+import matplotlib.pyplot as plt
 import yfinance as yf
 
 dt: float = 1./365.25
