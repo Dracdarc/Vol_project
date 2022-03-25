@@ -7,7 +7,7 @@ def get_option_data(
     want_call: bool = True
 ) -> pd.DataFrame:
     option_data: pd.DataFrame = pd.read_csv(
-        data_folder_path + "/OptionMetric_{}_SPX_DATA.csv".format_map(year)
+        data_folder_path + "/OptionMetric_{}_SPX_DATA.csv".format(year)
     )
 
     option_data = option_data[option_data["exercise_style"] == 'E']
