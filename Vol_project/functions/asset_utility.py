@@ -3,7 +3,6 @@ from functions.math_utility import ln, avg
 import pandas as pd
 import yfinance as yf
 
-
 dt: float = 1./365.25
 
 
@@ -47,3 +46,11 @@ def get_SPX_param(year: int, past_period: int) -> (float):
         return get_param(time_line, list(spx_data['asset_price']))
     else:
         return (-1, -1)
+
+
+def display_SPX(year: int, past_period: int) -> None:
+    """
+    Show SPX between year-1-past_period and year.
+    """
+    get_SPX_data(year, past_period)["asset_price"].plot()
+    plt.show()
