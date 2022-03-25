@@ -6,7 +6,7 @@ def get_option_data(
     data_folder_path: str,
     want_call: bool = True
 ) -> pd.DataFrame:
-    option_data: pd.DataFrame = pd.read(
+    option_data: pd.DataFrame = pd.read_csv(
         data_folder_path + "/OptionMetric_{}_SPX_DATA.csv".format_map(year)
     )
 
