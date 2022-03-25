@@ -16,7 +16,7 @@ def get_option_data(
         option_data["cp_flag"] == ("C" if want_call else "P")
     ]
 
-    for column in ["Date", "exdate", "last_date"]:
+    for column in ["date", "exdate", "last_date"]:
         option_data[column] = pd.to_datetime(
             option_data[column], format="%Y%m%d"
         )
