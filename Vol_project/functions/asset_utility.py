@@ -30,7 +30,7 @@ def get_SPX_data(year: int, past_period: int) -> pd.DataFrame:
     """
     asset_data: pd.DataFrame
     asset_data = yf.Ticker("^GSPC").history(period="max")[["Open"]]
-    asset_data = asset_data[str(year - 1 - past_period): str(year - 1)]
+    asset_data = asset_data[str(year - past_period): str(year)]
     asset_data = asset_data.rename(columns={'Open': 'asset_price'})
     return asset_data
 
@@ -51,7 +51,7 @@ def get_SPX_param(year: int, past_period: int) -> (float):
 
 def display_SPX(year: int, past_period: int) -> None:
     """
-    Show SPX between year-1-past_period and year.
+    Show SPX between year-past_period and year.
     """
     get_SPX_data(year, past_period)["asset_price"].plot()
     plt.show()
