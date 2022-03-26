@@ -117,6 +117,10 @@ class OptionMonitoring:
         ) / alpha
         return normal_cdf(d1)
 
+    def get_pnl(self) -> float:
+        if self.pnl:
+            return self.pnl[-1]
+
     def display(
         self,
         full_time_to_ex: [float] = [],
