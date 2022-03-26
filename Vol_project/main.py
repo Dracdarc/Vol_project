@@ -20,6 +20,7 @@ strike: float = 100.
 
 
 time_line: np.array = np.linspace(0., maturity, n_tics+1)
+time_to_ex: np.array = time_line[::-1]
 dt: float = time_line[1]
 
 asset_prices: [float] = generate_GBM(
@@ -34,12 +35,12 @@ option_prices = [
 ]
 
 world: OptionMonitoring = OptionMonitoring(
-    maturity=maturity,
     strike=strike,
     interest=interest
 )
 
 world.init(
+    time_to_ex=time_to_ex[0],
     underlying_price=asset_prices[0],
     option_price=option_prices[0],
     volatility=realized_volatility
@@ -47,7 +48,7 @@ world.init(
 
 for t in range(n_tics+1)[::refresh_rate][1:]:
     world.update(
-        time=time_line[t],
+        time_to_ex=time_to_ex[t],
         underlying_price=asset_prices[t],
         option_price=option_prices[t],
         volatility=abs(realized_volatility + np.random.normal(0., 0.05))
@@ -59,7 +60,7 @@ world.end(
 )
 
 world.display(
-    full_time_line=time_line,
+    full_time_to_ex=time_to_ex,
     full_underlying_prices=asset_prices,
     full_option_prices=option_prices
 )

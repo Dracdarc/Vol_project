@@ -9,17 +9,15 @@ class OptionMonitoring:
 
     def __init__(
         self,
-        maturity: float,
         strike: float,
         interest: float,
         charges=lambda move_cash, move_asset: 0.
     ) -> None:
-        self.maturity: float = maturity
         self.strike: float = strike
         self.interest: float = interest
         self.charges = charges
 
-        self.time_line: [float] = []
+        self.time_to_ex: [float] = []
         self.underlying_prices: [float] = []
         self.option_prices: [float] = []
         self.volatilities: [float] = []
@@ -34,12 +32,13 @@ class OptionMonitoring:
 
     def init(
         self,
+        time_to_ex: float,
         underlying_price: float,
         option_price: float,
         volatility: float
     ) -> None:
         if not self.end_flag:
-            self.time_line.append(0.)
+            self.time_to_ex.append(time_to_ex)
             self.underlying_prices.append(underlying_price)
             self.option_prices.append(option_price)
             self.volatilities.append(volatility)
@@ -55,7 +54,7 @@ class OptionMonitoring:
 
     def update(
         self,
-        time: float,
+        time_to_ex: float,
         underlying_price: float,
         option_price: float,
         volatility: float
@@ -63,15 +62,15 @@ class OptionMonitoring:
         if (
             self.init_flag
             and not self.end_flag
-            and self.time_line[-1] < time <= self.maturity
+            and 0. <= time_to_ex < self.time_to_ex[-1]
         ):
-            self.time_line.append(time)
+            self.time_to_ex.append(time_to_ex)
             self.underlying_prices.append(underlying_price)
             self.option_prices.append(option_price)
             self.volatilities.append(volatility)
             self.deltas.append(self.get_delta())
 
-            dt: float = self.time_line[-1] - self.time_line[-2]
+            dt: float = self.time_to_ex[-2] - self.time_to_ex[-1]
             d_delta: float = self.deltas[-1] - self.deltas[-2]
             self.cash.append(self.cash[-1]*exp(self.interest*dt))
             new_cash: float = option_price - self.deltas[-1]*underlying_price
@@ -94,9 +93,9 @@ class OptionMonitoring:
         option_price: float
     ) -> None:
         if not self.end_flag:
-            if self.maturity != self.time_line[-1]:
+            if self.time_to_ex[-1] != 0.:
                 self.update(
-                    self.maturity,
+                    0.,
                     underlying_price,
                     option_price,
                     0.
@@ -108,7 +107,7 @@ class OptionMonitoring:
             self.end_flag = True
 
     def get_delta(self) -> None:
-        tau: float = self.maturity - self.time_line[-1]
+        tau: float = self.time_to_ex[-1]
         alpha: float = self.volatilities[-1] * tau**.5
         if alpha == 0.:
             alpha = 1e-10
@@ -120,49 +119,50 @@ class OptionMonitoring:
 
     def display(
         self,
-        full_time_line: [float] = [],
+        full_time_to_ex: [float] = [],
         full_underlying_prices: [float] = [],
         full_option_prices: [float] = []
     ) -> bool:
         fig, axs = plt.subplots(6, figsize=(20, 14), dpi=100)
+        maturity: float = self.time_to_ex[0]
         color: str = "Red"
         if self.underlying_prices[-1] > self.strike:
             color = "Green"
         if full_underlying_prices:
             axs[0].plot(
-                full_time_line,
+                full_time_to_ex,
                 full_underlying_prices,
                 linewidth=0.7, color=color
             )
         else:
             axs[0].plot(
-                self.time_line,
+                self.time_to_ex,
                 self.underlying_prices,
                 linewidth=0.7, color=color
             )
-        axs[0].hlines(self.strike, 0., self.maturity, linewidth=0.7)
+        axs[0].hlines(self.strike, 0., maturity, linewidth=0.7)
         if full_option_prices:
             axs[1].plot(
-                full_time_line,
+                full_time_to_ex,
                 full_option_prices,
                 label="Option price", linewidth=1.
             )
         axs[1].plot(
-            self.time_line,
+            self.time_to_ex,
             self.portfolio_value,
             label="Portfolio value", linewidth=0.7, marker='.'
         )
-        axs[2].plot(self.time_line, self.deltas, drawstyle='steps-post')
+        axs[2].plot(self.time_to_ex, self.deltas, drawstyle='steps-post')
         if self.underlying_prices[-1] > self.strike:
-            axs[2].hlines(1., 0., self.maturity, linewidth=0.7)
+            axs[2].hlines(1., 0., maturity, linewidth=0.7)
         else:
-            axs[2].hlines(0., 0., self.maturity, linewidth=0.7)
-        axs[3].plot(self.time_line, self.pnl, drawstyle='steps-post')
+            axs[2].hlines(0., 0., maturity, linewidth=0.7)
+        axs[3].plot(self.time_to_ex, self.pnl, drawstyle='steps-post')
         axs[4].plot(
-            self.time_line[:-1], self.volatilities[:-1],
+            self.time_to_ex[:-1], self.volatilities[:-1],
             drawstyle='steps-post'
         )
-        axs[5].plot(self.time_line, self.cash, drawstyle='steps-post')
+        axs[5].plot(self.time_to_ex, self.cash, drawstyle='steps-post')
         axs[0].set_title("Underlying price")
         axs[1].set_title("Strategy")
         axs[2].set_title("Hedge ratio")
@@ -170,7 +170,8 @@ class OptionMonitoring:
         axs[4].set_title("Volatility")
         axs[5].set_title("Cash")
         for ax in axs.flat:
-            ax.set(xlabel="Time in year", ylabel="Price")
+            ax.set(xlabel="Time to exercise in year", ylabel="Price")
+            ax.invert_xaxis()
             ax.label_outer()
         axs[1].legend()
         axs.flat[2].set(ylabel="")
