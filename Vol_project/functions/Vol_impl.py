@@ -1,4 +1,4 @@
-from functions.math_BS_pricing import black_scholes_pricing
+from functions.BS_pricing import black_scholes_pricing
 
 
 ITERATION_NUM: int = 10
