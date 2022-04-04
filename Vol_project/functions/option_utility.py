@@ -2,12 +2,15 @@ import pandas as pd
 
 
 def get_option_data(
+    index_name: str,
     year: int,
     data_folder_path: str,
     want_call: bool = True
 ) -> pd.DataFrame:
     option_data: pd.DataFrame = pd.read_csv(
-        data_folder_path + "/OptionMetric_{}_SPX_DATA.csv".format(year)
+        data_folder_path + "/OptionMetric_{}_{}_DATA.csv".format(
+            year, index_name
+        )
     )
 
     option_data = option_data[option_data["exercise_style"] == 'E']
