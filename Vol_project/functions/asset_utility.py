@@ -7,6 +7,13 @@ import yfinance as yf
 dt: float = 1./365.25
 
 
+INDEX_NAME: "{str: str}" = {
+    "SPX": "^GSPC",
+    "DJX": "^DXL",
+    "NDX": "^NDX"
+}
+
+
 def get_param(time: [float], asset_values: [float]) -> (float):
     """
     Return a tuple with the drift then the realized volatility.
@@ -24,32 +31,98 @@ def get_param(time: [float], asset_values: [float]) -> (float):
     return (alpha/dt_avg + .5*sigma_2, sigma_2**.5)
 
 
-def get_SPX_data(year: int, past_period: int) -> pd.DataFrame:
+def get_asset_data(name: str, year: int, past_period: int) -> pd.DataFrame:
     """
     Return asset values for 'past_period' year til 'year'.
     """
     asset_data: pd.DataFrame
-    asset_data = yf.Ticker("^GSPC").history(period="max")[["Open"]]
+    asset_data = yf.Ticker(name).history(period="max")[["Open"]]
     asset_data = asset_data[str(year - past_period): str(year-1)]
     asset_data = asset_data.rename(columns={'Open': 'asset_price'})
     return asset_data
 
 
-def get_SPX_param(year: int, past_period: int) -> (float):
+def get_asset_param(name: str, year: int, past_period: int) -> (float):
     """
     Return SPX param calculated on 'past_period' years before 'year'.
     """
-    spx_data: pd.DataFrame = get_SPX_data(year, past_period)
-    if len(spx_data):
+    asset_data: pd.DataFrame = get_asset_data(name, year, past_period)
+    if len(asset_data):
         time_line: [float] = [0.]
-        for _ in range(len(spx_data) - 1):
+        for _ in range(len(asset_data) - 1):
             time_line.append(time_line[-1] + dt)
-        return get_param(time_line, list(spx_data['asset_price']))
+        return get_param(time_line, list(asset_data['asset_price']))
     else:
         return (-1, -1)
 
 
+def get_SPX_data(year: int, past_period: int) -> pd.DataFrame:
+    """
+    Return asset values for 'past_period' year til 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["SPX"], year, past_period)
+
+
+def get_SPX_param(year: int, past_period: int) -> (float):
+    """
+    Return SPX param calculated on 'past_period' years before 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["SPX"], year, past_period)
+
+
+def get_DJX_data(year: int, past_period: int) -> pd.DataFrame:
+    """
+    Return asset values for 'past_period' year til 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["DJX"], year, past_period)
+
+
+def get_DJX_param(year: int, past_period: int) -> (float):
+    """
+    Return SPX param calculated on 'past_period' years before 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["DJX"], year, past_period)
+
+
+def get_NDX_data(year: int, past_period: int) -> pd.DataFrame:
+    """
+    Return asset values for 'past_period' year til 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["NDX"], year, past_period)
+
+
+def get_NDX_param(year: int, past_period: int) -> (float):
+    """
+    Return SPX param calculated on 'past_period' years before 'year' for SPX.
+    """
+    return get_asset_data(INDEX_NAME["NDX"], year, past_period)
+
+
+def display_asset(name: str, year: int, past_period: int) -> None:
+    """
+    Show the asset prices between year-past_period and year.
+    """
+    get_asset_data(name, year, past_period)["asset_price"].plot()
+    plt.show()
+
+
 def display_SPX(year: int, past_period: int) -> None:
+    """
+    Show SPX between year-past_period and year.
+    """
+    get_SPX_data(year, past_period)["asset_price"].plot()
+    plt.show()
+
+
+def display_DJX(year: int, past_period: int) -> None:
+    """
+    Show SPX between year-past_period and year.
+    """
+    get_SPX_data(year, past_period)["asset_price"].plot()
+    plt.show()
+
+
+def display_NDX(year: int, past_period: int) -> None:
     """
     Show SPX between year-past_period and year.
     """
