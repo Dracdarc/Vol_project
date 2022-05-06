@@ -57,7 +57,7 @@ def get_asset_param(name: str, year: int, past_period: int) -> (float):
 
 
 def get_realized_volatility_list(
-    name: str, date_series: pd.series, days_retro: int
+    name: str, date_series: "pd.series", days_retro: int
 ) -> [float]:
     asset_data: pd.DataFrame = get_asset_data(
         name, date_series.iloc[-1] + 1, past_period=2
