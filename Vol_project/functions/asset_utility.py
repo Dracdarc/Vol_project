@@ -76,7 +76,7 @@ def get_realized_volatility_list(
             )
         )
         index += 1
-    return pd.series(realized_volatility)
+    return realized_volatility
 
 
 def display_asset(name: str, year: int, past_period: int) -> None:
