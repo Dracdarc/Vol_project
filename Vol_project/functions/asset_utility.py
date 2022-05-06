@@ -59,22 +59,22 @@ def get_asset_param(name: str, year: int, past_period: int) -> (float):
 def get_realized_volatility_list(
     name: str, date_series: "pd.series", days_retro: int = 25
 ) -> [float]:
-    print("!!!")
     realized_volatility: [float] = []
     asset_data: pd.DataFrame = get_asset_data(
         name, date_series.iloc[-1].year + 1, past_period=2
-    )
+    ).reset_index()
     index: int = asset_data.index[
-        asset_data["date"] == date_series.iloc[0]
+        asset_data["Date"] == date_series[0]
     ].to_list()[0]
     local_info: pd.DataFrame
+    time_line: [float] = [i*dt for i in range(days_retro)]
     for i in range(len(date_series)):
         local_info = asset_data[(index-days_retro):index]
         realized_volatility.append(
             get_param(
-                local_info["date"].to_list(),
-                local_info["asset_value"].to_list()
-            )
+                time_line,
+                local_info["asset_price"].to_list()
+            )[1]
         )
         index += 1
     return realized_volatility

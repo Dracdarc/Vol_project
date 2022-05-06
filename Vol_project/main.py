@@ -1,10 +1,12 @@
 from functions.playground import OptionMonitoring
 from functions.BS_pricing import black_scholes_pricing
 from functions.math_utility import generate_GBM
+import functions.asset_utility as au
 
 import numpy as np
 from matplotlib import pyplot as plt
 
+"""
 n_tics: int = 24*365
 refresh_rate: int = 12
 charges: float = .0
@@ -64,3 +66,7 @@ world.display(
     full_underlying_prices=asset_prices,
     full_option_prices=option_prices
 )
+"""
+
+df = au.get_asset_data("SPX", 2018, 1).reset_index()
+print(au.get_realized_volatility_list("SPX", df["Date"]))
