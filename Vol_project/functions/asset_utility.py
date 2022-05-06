@@ -44,7 +44,7 @@ def get_asset_data(name: str, year: int, past_period: int) -> pd.DataFrame:
 
 def get_asset_param(name: str, year: int, past_period: int) -> (float):
     """
-    Return SPX param calculated on 'past_period' years before 'year'.
+    Return asset param calculated on 'past_period' years before 'year'.
     """
     asset_data: pd.DataFrame = get_asset_data(name, year, past_period)
     if len(asset_data):
@@ -54,6 +54,29 @@ def get_asset_param(name: str, year: int, past_period: int) -> (float):
         return get_param(time_line, list(asset_data['asset_price']))
     else:
         return (-1, -1)
+
+
+def get_realized_volatility_list(
+    name: str, date_series: pd.series, days_retro: int
+) -> [float]:
+    asset_data: pd.DataFrame = get_asset_data(
+        name, date_series.iloc[-1] + 1, past_period=2
+    )
+    realized_volatility: [float] = []
+    index: int = asset_data.index[
+        asset_data["date"] == date_series.iloc[0]
+    ].to_list()[0]
+    local_info: pd.DataFrame
+    for i in range(len(date_series)):
+        local_info = asset_data[(index-days_retro):index]
+        realized_volatility.append(
+            get_param(
+                local_info["date"].to_list(),
+                local_info["asset_value"].to_list()
+            )
+        )
+        index += 1
+    return pd.series(realized_volatility)
 
 
 def display_asset(name: str, year: int, past_period: int) -> None:
