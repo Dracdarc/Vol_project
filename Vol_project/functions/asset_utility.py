@@ -68,6 +68,7 @@ def get_realized_volatility_list(
     ].to_list()[0]
     local_info: pd.DataFrame
     for i in range(len(date_series)):
+        """
         local_info = asset_data[(index-days_retro):index]
         realized_volatility.append(
             get_param(
@@ -75,6 +76,8 @@ def get_realized_volatility_list(
                 local_info["asset_value"].to_list()
             )
         )
+        """
+        print(index)
         index += 1
     return realized_volatility
 
