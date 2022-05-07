@@ -102,7 +102,9 @@ def get_market_cycle(
     ).fit(asset_data[["dlog_price", "sigma_srdt"]]).predict(
         asset_data[["dlog_price", "sigma_srdt"]]
     )
-    return asset_data.drop(columns=["dlog_price", "sigma_srdt"])
+    return asset_data.drop(
+        columns=["dlog_price", "sigma_srdt"]
+    ).reset_index(drop=True)
 
 
 def display_asset(name: str, year: int, past_period: int) -> None:
