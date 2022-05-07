@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
 
+from sklearn import mixture
+
 dt: float = 1./365.25
 
 
@@ -78,6 +80,29 @@ def get_realized_volatility_list(
         )
         index += 1
     return realized_volatility
+
+
+def get_market_cycle(
+    name: str, year: int, past_period: int, n_cluster: int = 3
+) -> "pd.DataFrame":
+    asset_data: pd.DataFrame = get_asset_data(
+        name, year + 1, past_period + 1
+    ).reset_index()
+    asset_data["dlog_price"] = \
+        asset_data["asset_price"] / asset_data["asset_price"].shift(1) - 1
+    asset_data["sigma_srdt"] = \
+        asset_data["dlog_price"].rolling(25).std()
+    asset_data = asset_data.drop(
+        asset_data[
+            asset_data["Date"].dt.year == asset_data["Date"].iloc[0].year
+        ].index
+    )
+    asset_data["cycle"] = mixture.GaussianMixture(
+        n_components=n_cluster, covariance_type="full"
+    ).fit(asset_data[["dlog_price", "sigma_srdt"]]).predict(
+        asset_data[["dlog_price", "sigma_srdt"]]
+    )
+    return asset_data.drop(columns=["dlog_price", "sigma_srdt"])
 
 
 def display_asset(name: str, year: int, past_period: int) -> None:

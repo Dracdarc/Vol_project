@@ -68,5 +68,17 @@ world.display(
 )
 """
 
-df = au.get_asset_data("SPX", 2018, 1).reset_index()
-print(au.get_realized_volatility_list("SPX", df["Date"]))
+df = au.get_market_cycle("SPX", 2018, 1)
+print(df)
+
+
+plt.plot(df["Date"], df["asset_price"], color="black", zorder=1)
+for i in range(3):
+    plt.scatter(
+        df[df["cycle"] == i]["Date"],
+        df[df["cycle"] == i]["asset_price"],
+        label=str(i),
+        zorder=2
+    )
+plt.legend()
+plt.show()
