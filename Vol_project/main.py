@@ -6,7 +6,7 @@ import functions.asset_utility as au
 import numpy as np
 from matplotlib import pyplot as plt
 
-"""
+
 n_tics: int = 24*365
 refresh_rate: int = 12
 charges: float = .0
@@ -32,13 +32,14 @@ asset_prices: [float] = generate_GBM(
 option_prices = [
   black_scholes_pricing(
     asset_prices[i], strike, realized_volatility,
-    interest, time_line[-1]-time_line[i]
+    interest, time_line[-1]-time_line[i], "put"
   ) for i in range(n_tics+1)
 ]
 
 world: OptionMonitoring = OptionMonitoring(
     strike=strike,
-    interest=interest
+    interest=interest,
+    option_type="put"
 )
 
 world.init(
@@ -66,8 +67,8 @@ world.display(
     full_underlying_prices=asset_prices,
     full_option_prices=option_prices
 )
-"""
 
+"""
 df = au.get_market_cycle("SPX", 2018, 1)
 print(df)
 
@@ -82,3 +83,4 @@ for i in range(3):
     )
 plt.legend()
 plt.show()
+"""

@@ -11,11 +11,13 @@ class OptionMonitoring:
         self,
         strike: float,
         interest: float,
-        charges=lambda move_cash, move_asset: 0.
+        charges=lambda move_cash, move_asset: 0.,
+        option_type: str = "call"
     ) -> None:
         self.strike: float = strike
         self.interest: float = interest
         self.charges = charges
+        self.option_type: str = option_type
 
         self.time_to_ex: [float] = []
         self.underlying_prices: [float] = []
@@ -100,8 +102,10 @@ class OptionMonitoring:
                     option_price,
                     0.
                 )
-            if underlying_price > self.strike:
+            if self.option_type == "call" and underlying_price > self.strike:
                 self.pnl[-1] += self.strike
+            if self.option_type == "put" and underlying_price < self.strike:
+                self.pnl[-1] -= self.strike
             self.pnl[-1] += self.cash[-1]
             self.cash[-1] = 0.
             self.end_flag = True
@@ -115,7 +119,10 @@ class OptionMonitoring:
             ln(self.underlying_prices[-1] / self.strike)
             + (self.interest + (self.volatilities[-1]**2)/2.) * tau
         ) / alpha
-        return normal_cdf(d1)
+        if self.option_type == "call":
+            return normal_cdf(d1)
+        else:
+            return -normal_cdf(-d1)
 
     def get_pnl(self) -> float:
         if self.pnl:
@@ -157,8 +164,17 @@ class OptionMonitoring:
             label="Portfolio value", linewidth=0.7, marker='.'
         )
         axs[2].plot(self.time_to_ex, self.deltas, drawstyle='steps-post')
-        if self.underlying_prices[-1] > self.strike:
-            axs[2].hlines(1., 0., maturity, linewidth=0.7)
+        if (
+                self.option_type == "call"
+                and self.underlying_prices[-1] > self.strike
+        ) or (
+                self.option_type == "put"
+                and self.underlying_prices[-1] < self.strike
+        ):
+            axs[2].hlines(
+                1. if self.option_type == "call" else -1,
+                0., maturity, linewidth=0.7
+            )
         else:
             axs[2].hlines(0., 0., maturity, linewidth=0.7)
         axs[3].plot(self.time_to_ex, self.pnl, drawstyle='steps-post')
